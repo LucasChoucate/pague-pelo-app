@@ -1,69 +1,72 @@
-import Image from "next/image";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { connection } from "next/server";
+import { DoorOpen, Scale, Smartphone, Timer } from "lucide-react";
+import { LogoMarca } from "@/components/Marca";
+import { Alerta, Cartao } from "@/components/ui";
+import { obterSessao, supabaseConfigurado } from "@/lib/auth";
+import { HOME_DO_PAPEL } from "@/lib/tipos";
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+export default async function Inicio() {
+  await connection();
+  if (!supabaseConfigurado()) {
+    return (
+      <main className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center gap-4 px-4 py-10">
+        <LogoMarca className="text-2xl" />
+        <Alerta tipo="atencao">Falta conectar o Supabase.</Alerta>
+        <Cartao className="flex flex-col gap-2 text-sm leading-relaxed">
+          <p>1. Crie um projeto em supabase.com e rode <code>supabase/schema.sql</code> no SQL Editor.</p>
+          <p>2. Copie <code>.env.example</code> para <code>.env.local</code> e preencha as chaves.</p>
+          <p>3. Rode <code>npm run seed</code> e reinicie o <code>npm run dev</code>.</p>
+          <p className="text-texto-2">O passo a passo completo está no README.md.</p>
+        </Cartao>
       </main>
-    </div>
+    );
+  }
+
+  const perfil = await obterSessao();
+  if (perfil) redirect(HOME_DO_PAPEL[perfil.papel]);
+
+  return (
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-4 pb-10 pt-[max(env(safe-area-inset-top),24px)]">
+      <LogoMarca className="text-xl" />
+      <section className="linhas-decorativas rounded-[32px] bg-marca p-7 text-marca-texto shadow-cartao">
+        <h1 className="text-3xl font-bold leading-tight">Almoce, pague no celular e saia sem fila.</h1>
+        <p className="mt-3 opacity-90">A comanda digital dos restaurantes a quilo.</p>
+      </section>
+
+      <Cartao>
+        <ul className="flex flex-col gap-4">
+          {[
+            [Smartphone, "Comanda no celular", "Escaneie o QR da entrada."],
+            [Scale, "Itens ao vivo", "Pesou, apareceu na sua tela."],
+            [Timer, "Pix ou cartão", "Pague quando quiser, pelo app."],
+            [DoorOpen, "Saída sem fila", "Mostre o passe e pronto."],
+          ].map(([Icone, t, d], i) => {
+            const I = Icone as typeof Smartphone;
+            return (
+              <li key={i} className="flex items-center gap-3">
+                <span className="grid size-11 place-items-center rounded-full bg-marca-clara text-marca">
+                  <I className="size-5" aria-hidden />
+                </span>
+                <div>
+                  <p className="font-semibold">{t as string}</p>
+                  <p className="text-sm text-texto-2">{d as string}</p>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </Cartao>
+
+      <div className="flex flex-col gap-3">
+        <Link href="/cadastro" className="flex min-h-14 items-center justify-center rounded-botao bg-marca text-lg font-semibold text-marca-texto shadow-cartao hover:brightness-110">
+          Criar conta
+        </Link>
+        <Link href="/login" className="flex min-h-12 items-center justify-center rounded-botao border border-borda bg-superficie font-semibold">
+          Entrar
+        </Link>
+      </div>
+    </main>
   );
 }

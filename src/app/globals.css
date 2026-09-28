@@ -1,26 +1,149 @@
 @import "tailwindcss";
 
+/*
+ * Tokens do Pague pelo App. Troque a paleta SÓ aqui.
+ * As cores de status são reservadas: nunca use para decoração.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --marca: #0f766e;
+  --marca-realce: #14b8a6;
+  --marca-clara: #ccfbf1;
+  --marca-texto: #ffffff; /* texto sobre botões da marca */
+  --destaque: #ff6b4a; /* coral: sempre com texto escuro */
+  --destaque-texto: #0f172a;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --fundo: #f8fafc;
+  --superficie: #ffffff;
+  --superficie-2: #f1f5f9;
+  --borda: #e2e8f0;
+  --texto: #0f172a;
+  --texto-2: #64748b;
+
+  --ok: #16a34a;
+  --atencao: #d97706;
+  --erro: #dc2626;
+  --info: #2563eb;
+  /* versões para texto sobre fundo claro */
+  --ok-texto: #15803d;
+  --atencao-texto: #b45309;
+  --erro-texto: #b91c1c;
+  --info-texto: #1d4ed8;
+
+  /* Cor do restaurante (sobrescrita inline por página). */
+  --restaurante: var(--marca);
+
+  --sombra: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px rgb(15 23 42 / 0.06);
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --marca: #2dd4bf;
+    --marca-realce: #5eead4;
+    --marca-clara: #134e4a;
+    --marca-texto: #0b1220;
+    --destaque: #ff8a70;
+    --destaque-texto: #0b1220;
+
+    --fundo: #0b1220;
+    --superficie: #111827;
+    --superficie-2: #1a2333;
+    --borda: #1f2937;
+    --texto: #f1f5f9;
+    --texto-2: #94a3b8;
+
+    --ok: #22c55e;
+    --atencao: #f59e0b;
+    --erro: #ef4444;
+    --info: #3b82f6;
+    --ok-texto: #4ade80;
+    --atencao-texto: #fbbf24;
+    --erro-texto: #f87171;
+    --info-texto: #60a5fa;
+
+    --sombra: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.25);
+    color-scheme: dark;
   }
 }
 
+@theme inline {
+  --color-marca: var(--marca);
+  --color-marca-realce: var(--marca-realce);
+  --color-marca-clara: var(--marca-clara);
+  --color-marca-texto: var(--marca-texto);
+  --color-destaque: var(--destaque);
+  --color-destaque-texto: var(--destaque-texto);
+  --color-fundo: var(--fundo);
+  --color-superficie: var(--superficie);
+  --color-superficie-2: var(--superficie-2);
+  --color-borda: var(--borda);
+  --color-texto: var(--texto);
+  --color-texto-2: var(--texto-2);
+  --color-ok: var(--ok);
+  --color-atencao: var(--atencao);
+  --color-erro: var(--erro);
+  --color-info: var(--info);
+  --color-ok-texto: var(--ok-texto);
+  --color-atencao-texto: var(--atencao-texto);
+  --color-erro-texto: var(--erro-texto);
+  --color-info-texto: var(--info-texto);
+  --color-restaurante: var(--restaurante);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --radius-botao: 12px;
+  --shadow-cartao: var(--sombra);
+}
+
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--fundo);
+  color: var(--texto);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Valores monetários e códigos: números tabulares. */
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 3px solid var(--marca-realce);
+  outline-offset: 2px;
+}
+
+/* Linhas decorativas dos cartões de destaque (inspiradas na referência). */
+.linhas-decorativas {
+  background-image:
+    radial-gradient(circle at 110% -10%, transparent 38%, rgb(255 255 255 / 0.1) 38.4%, transparent 39%),
+    radial-gradient(circle at 110% -10%, transparent 52%, rgb(255 255 255 / 0.08) 52.4%, transparent 53%),
+    radial-gradient(circle at -20% 120%, transparent 44%, rgb(255 255 255 / 0.08) 44.4%, transparent 45%),
+    radial-gradient(circle at -20% 120%, transparent 60%, rgb(255 255 255 / 0.06) 60.4%, transparent 61%);
+}
+
+@keyframes pulso-vivo {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.pulso-vivo {
+  animation: pulso-vivo 1.2s ease-in-out infinite;
+}
+
+@keyframes brilho {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+.brilho-passante::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.25) 50%, transparent 70%);
+  animation: brilho 2.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulso-vivo, .brilho-passante::after { animation: none; }
 }
